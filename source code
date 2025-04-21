@@ -1,0 +1,1167 @@
+package assignment3;
+
+import java.util.ArrayList; //needed for lists used 
+                            //throughout the system
+import java.util.Scanner; //for taking user inout in the 
+                          //in main testing program
+import java.util.InputMismatchException; //for preventing crashes
+                                         //in case of mismatched datatypes
+
+//emergency message needed for vitals
+class EmergencyAlert {
+    public void triggerAlert(String message){
+        System.out.println("|EMERGENCY ALERT MESSAGE| " + message);
+    }
+}
+
+//interface for abstract method for emails and sms messages
+interface NotificationService {
+    void sendNotification(String receiver, String message);
+}
+
+//class for handling emails
+class EmailNotification implements NotificationService {
+    @Override
+    public void sendNotification(String receiver, String message) {
+        System.out.println("|Email| To: " + receiver + " | Message: " + message);
+    }
+}
+
+//class for handling all sms messages of user
+class SMSNotification implements NotificationService {
+    @Override
+    public void sendNotification(String receiver, String message) {
+        System.out.println("|SMS| To: " + receiver + " | Message: " + message);
+    }
+}
+
+
+//emergency button under patients' manual control
+class PanicButton {
+    public void patientPress() {
+        System.out.println("|Panic Button Manual Alert| Alert "
+                + "sent to all saved emergency contacts!");
+    }
+}
+
+
+
+//classes for handling chat and video consultations
+class ChatServer {
+    public void startChat() {
+        System.out.println("|Chat Server| Connection loading...");
+    }
+}
+
+class ChatClient {
+    public void sendMessage(String message) {
+        System.out.println("|Chat Message| " + message);
+    }
+}
+
+class VideoCall {
+    public void startCall(String host, String receiver) {
+        System.out.println("|Video Call| Connecting " + host + " to " + receiver + "...");
+    }
+}
+
+//parent class
+class User {
+    
+    //instance variables declaration
+    private int userID;
+    private String username;
+    private String firstName;
+    private String lastName;
+    private String email;
+    private char gender;
+    
+    //parameterized constructor
+    User(int userID, String username, String first, String last, String email, char gen){
+        this.userID = userID;
+        this.username = username;
+        this.firstName = first;
+        this.lastName = last;
+        this.email= email;
+        this.gender = gen;
+    }
+    
+    //relevant getter methods 
+    public int getUserID(){
+        return userID;
+    }
+    
+    public String getUsername(){
+        return username;
+    }
+    
+    public String getFirstName(){
+        return firstName;
+    }
+   
+    public String getLastName(){
+        return lastName;
+    }
+    
+    public String getEmail(){
+        return email;
+    }
+    
+    public char getGender(){
+        return gender;
+    }
+    
+
+}
+
+//child class of User
+class Patient extends User {
+    
+    //instance variables
+    private int patientID;
+    private String bloodType;
+    private String primaryDoctor; //first go-to primary consultant
+    private boolean hasInsurance;
+    private ArrayList<VitalSign> vitals = new ArrayList<>();        
+    private ArrayList<Appointment> appointments = new ArrayList<>(); 
+    private ArrayList<Feedback> feedbacks = new ArrayList<>();      
+    private MedicalHistory medicalHistory; 
+    
+    //parameterized constructor
+    Patient(int uID, String uname, String uf, String ul, 
+           String uemail, char ugen, int patientID, String bloodType,
+           String primaryDoctor, boolean hasInsurance){
+    super(uID, uname, uf, ul, uemail, ugen);
+    this.patientID = patientID;
+    this.bloodType = bloodType;
+    this.primaryDoctor = primaryDoctor;
+    this.hasInsurance = hasInsurance;
+    this.medicalHistory = new MedicalHistory();
+}
+    
+    //relevant getter methods
+    public String getName(){
+        return super.getFirstName() + " " + super.getLastName();
+    }
+    public int getPatientID(){
+        return patientID;
+    }
+    
+    public String getBloodType(){
+        return bloodType;
+    }
+    
+    public String getPrimaryDoctor(){
+        return primaryDoctor;
+    }
+    
+    public boolean getHasInsurance(){
+        return hasInsurance;
+    }
+    
+    //adding a vital for patient
+    public void addVital(VitalSign vital) { 
+        vitals.add(vital); 
+    }
+
+    //patient can use for scheduling appointment
+    public void scheduleAppointment(Appointment appointment) { 
+        appointments.add(appointment);
+    }
+
+    //for getting relevant data
+    public ArrayList<VitalSign> getVitals() { 
+        return vitals; 
+    }
+    public ArrayList<Appointment> getAppointments() { 
+        return appointments; 
+    }
+    public ArrayList<Feedback> getFeedbacks() { 
+        return feedbacks; 
+    }
+
+    //display of all feedback from doctors
+    public void viewFeedback() {
+        if (feedbacks.isEmpty()) {
+            System.out.println("[INFO] No feedback available.");
+        } else {
+            for (Feedback f : feedbacks) System.out.println(f);
+        }
+    }
+
+    //new medical record entry addition
+    public void addMedicalRecord(Consultation consultation, Prescription prescription) {
+        medicalHistory.addConsultation(consultation);
+        medicalHistory.addPrescription(prescription);
+        
+    }
+
+    //displays the patient's medical history
+    public void viewMedicalHistory() {
+       System.out.println(medicalHistory); 
+    } 
+    
+    public void handle(Scanner sc, ArrayList<Doctor> doctors, AppointmentManager manager, EmergencyAlert emergencyAlert,
+                   PanicButton panicButton, ChatClient chatClient, VideoCall videoCall) {
+    while (true) {
+        try {
+            System.out.println("\nPatient Menu");
+            System.out.println("1. Upload Vital Signs");
+            System.out.println("2. View Doctor Feedback");
+            System.out.println("3. Schedule Appointment");
+            System.out.println("4. View My Appointments");
+            System.out.println("5. View My Vital Signs");
+            System.out.println("6. Panic Button");
+            System.out.println("7. Chat Doctor");
+            System.out.println("8. Video Call Doctor");
+            System.out.println("9. Emergency Alert");
+            System.out.println("0. Exit");
+
+            System.out.print("Select an option: ");
+            int ch = sc.nextInt(); sc.nextLine();  // Catch invalid integer input here
+
+            switch (ch) {
+                case 1:
+                    try {
+                        System.out.print("Enter Heart Rate: ");
+                        int heart = sc.nextInt();
+
+                        System.out.print("Enter Oxygen: ");
+                        int oxygen = sc.nextInt();
+
+                        System.out.print("Enter BP: ");
+                        String bp = sc.next();
+
+                        System.out.print("Enter Temp: ");
+                        double temp = sc.nextDouble();
+                        sc.nextLine();
+
+                        addVital(new VitalSign(this ,heart, oxygen, bp, temp));
+                    } catch (InputMismatchException e) {
+                        System.out.println("[Error] Invalid input type. Please enter correct values.");
+                        sc.nextLine(); // clear the buffer
+                    }
+                    break;
+
+                case 2:
+                    viewFeedback();
+                    break;
+
+                case 3:
+                    System.out.println("[Available Doctors]");
+                    for (Doctor d : doctors) {
+                        System.out.println("- " + d.getName());
+                    }
+
+                    System.out.print("Enter your preferred Doctor's Name: ");
+                    String docName = sc.nextLine();
+                    Doctor d = Assignment3.findDoctorByName(doctors, docName);
+
+                    if (d != null) {
+                        System.out.print("Enter your preferred Appointment Date (YYYY-MM-DD): ");
+                        String date = sc.nextLine();
+                        Appointment appt = new Appointment(date, d, this, "Pending.");
+                        manager.requestAppointment(appt);
+                        scheduleAppointment(appt);
+                        d.addAppointment(appt);
+                    } else {
+                        System.out.println("[Doctor not found]");
+                    }
+                    break;
+
+                case 4:
+                    for (Appointment a : appointments) {
+                        System.out.println("- " + a);
+                    }
+                    break;
+
+                case 5:
+                    for (VitalSign v : vitals) {
+                        System.out.println("- " + v);
+                    }
+                    break;
+
+                case 6:
+                    panicButton.patientPress();
+                    break;
+
+                case 7:
+                    System.out.print("Message: ");
+                    String msg = sc.nextLine();
+                    chatClient.sendMessage(msg);
+                    break;
+
+                case 8:
+                    System.out.print("Doctor Name: ");
+                    String dname = sc.nextLine();
+                    videoCall.startCall(getName(), dname);
+                    break;
+
+                case 9:
+             
+                    emergencyAlert.triggerAlert("Patient " + getName() + " triggered emergency!");
+                    break;
+
+                case 0:
+                    return;
+
+                default:
+                    System.out.println("[Invalid Choice]");
+            }
+        } catch (InputMismatchException e) {
+            System.out.println("[Error] Invalid input. Please enter a valid number.");
+            sc.nextLine(); // Clear buffer to avoid infinite loop
+        } catch (Exception e) {
+            System.out.println("[Unexpected Error] " + e.getMessage());
+        }
+    }
+    }
+    
+
+}
+
+//child class of User
+class Doctor extends User{
+    
+    //instance variables
+    private int doctorID;
+    private String password;
+    private String department;
+    private boolean isTraining;
+    private int yearsOfExperience;
+    private boolean isOnCallDuty;
+    private ArrayList<Patient> patientList;
+    private ArrayList<Feedback> feedbackList;
+    private ArrayList<Appointment> doctorAppointments = new ArrayList<>(); 
+    
+    //parameterized constructor
+    Doctor(int uID, String uname, String uf, String ul, 
+           String uemail, char ugen, int doctorID, String department,
+           boolean isTraining, int yearsOfExperience, boolean isOnCallDuty, String password){
+                super(uID, uname, uf, ul, uemail, ugen);
+                this.doctorID = doctorID;
+                this.department = department;
+                this.isTraining = isTraining;
+                this.yearsOfExperience = yearsOfExperience;
+                this.isOnCallDuty = isOnCallDuty;
+                this.patientList = new ArrayList<>();
+                this.feedbackList = new ArrayList<>();
+                this.password = password;
+    }
+    
+    //relevant getter methods
+    public ArrayList<Feedback> getFeedbackList(){
+        return feedbackList;
+    }
+    public String getName(){
+        return super.getFirstName() + " " + super.getLastName();
+    }
+    public int getDoctorID(){
+        return doctorID;
+    }
+    
+    public String getDepartment(){
+        return department;
+}
+    
+    public boolean getIsTraining(){
+        return isTraining;
+    }
+    
+    public int getYearsOfExperience(){
+        return yearsOfExperience;
+    }
+    
+    public boolean getIsOnCallDuty(){
+        return isOnCallDuty;
+    }
+    
+    public ArrayList<Patient> getPatientList(){
+        return patientList;
+    }
+    
+    //managing patient list
+    public void addPatient (Patient patient){
+        this.patientList.add(patient);
+    }
+    
+    public void removePatient (Patient patient){
+        this.patientList.remove(patient);
+    }
+    
+    public void clearPatients(){
+        this.patientList.clear();
+    }
+    
+     public void addAppointment(Appointment a){
+         doctorAppointments.add(a);
+     }
+
+    //authenticates a doctor's login
+    public boolean authenticate(String inputPassword) {
+        return this.password.equals(inputPassword);
+    }
+    
+    
+    //displays the doctor's scheduled appointments
+    public void viewAppointments() {
+        System.out.println("\n[Doctor's Appointments]");
+        if (doctorAppointments.isEmpty()) {
+            System.out.println("No scheduled appointments.");
+        } else {
+            for (Appointment apt : doctorAppointments) {
+                System.out.println("- " + apt);
+            }
+        }
+    }
+
+    //adds feedback for a patient
+    public void addFeedback(Patient patient, String feed) {
+        Feedback feedback = new Feedback(this.getName(), feed);
+        patient.getFeedbacks().add(feedback); // Adds feedback to patient's feedback list
+        System.out.println("[INFO] Feedback added for " + patient.getName());
+    }
+    
+    public void handle(Scanner sc, ArrayList<Patient> patients) {
+    while (true) {
+        try {
+            System.out.println("\n|Doctor Menu|");
+            System.out.println("1. View Patient List");
+            System.out.println("2. Provide Feedback");
+            System.out.println("3. View Appointments");
+            System.out.println("0. Exit");
+
+            System.out.print("Select: ");
+            int ch = sc.nextInt(); sc.nextLine(); // Read user input and handle buffer
+
+            switch (ch) {
+                case 1:
+                    //displaying patient list
+                    if (patients.isEmpty()) {
+                        System.out.println("[No Patients Available]");
+                    } else {
+                        for (Patient p : patients) {
+                            System.out.println(p.getUserID() + ": " + p.getName());
+                        }
+                    }
+                    break;
+
+                case 2:
+                    //prroviding feedback for a patient
+                    System.out.print("Enter Patient ID: ");
+                    int pid = sc.nextInt();
+                    Patient p = Assignment3.findPatientById(patients, pid);
+                    if (p != null) {
+                        System.out.print("Enter Feedback for your patient: ");
+                        String fb = sc.nextLine();
+                        addFeedback(p, fb); 
+                    } else {
+                        System.out.println("Patient  ot found.");
+                    }
+                    break;
+
+                case 3:
+                    //appointments of patient
+                    viewAppointments();
+                    break;
+
+                case 0:
+                    return;
+
+                default:
+                    System.out.println("Choice is invalid.");
+            }
+
+        } catch (InputMismatchException e) {
+            System.out.println("Invalid input. Please enter a valid number.");
+            sc.nextLine(); //clearing the input buffer to avoid non-stop loop
+        } catch (Exception e) {
+            System.out.println("|Error| " + e.getMessage());
+        }
+    }
+}
+}
+
+
+
+//independent class of the person managing system
+class Administrator{
+    
+    //instance variables
+        private String username = "Admin1";
+        private String password = "A4321";
+        private ArrayList<Doctor> doctors;  
+        private ArrayList<Patient> patients; 
+        
+        
+        //parameterized constructor
+        public Administrator(ArrayList<Doctor> doctors, ArrayList<Patient> patients) {
+        this.doctors = doctors;
+        this.patients = patients;
+    }
+        
+            //adding new doctor to the system
+    public void addDoctor(int uID, String uname, String uf, String ul, 
+           String uemail, char ugen, int doctorID, String department,
+           boolean isTraining, int yearsOfExperience, boolean isOnCallDuty, String pw) {
+        doctors.add(new Doctor(uID, uname, uf, ul, 
+           uemail, ugen, doctorID, department,
+           isTraining, yearsOfExperience, isOnCallDuty, pw));
+        System.out.println("|Info| Doctor added successfully.");
+        logAction("Doctor " + uname + " added.");
+    }
+
+    //new patient to the system
+    public void addPatient(int uID, String uname, String uf, String ul, 
+           String uemail, char ugen, int patientID, String bloodType,
+           String primaryDoctor, boolean hasInsurance) {
+        patients.add(new Patient(uID, uname, uf, ul, uemail, ugen, patientID,
+        bloodType, primaryDoctor, hasInsurance));
+        System.out.println("[INFO] Patient added successfully.");
+        logAction("Patient " + uname + " added.");
+    }
+
+    //authenticates admin login
+    public boolean authenticate(String ausername, String apassword) {
+        return username.equals(ausername) && password.equals(apassword);
+    }
+    private ArrayList<String> systemLogList = new ArrayList<>(); // Stores system logs
+
+    //logs admin actions
+    public void logAction(String message) {
+        systemLogList.add("|Log| " + message);
+    }
+
+    //displays system logs
+    public void viewLogs() {
+        if (systemLogList.isEmpty()) {
+            System.out.println("[INFO] No logs available.");
+        } else {
+            for (String log : systemLogList) System.out.println(log);
+        }
+    }
+   
+    
+    public void handle(Scanner sc) {
+    while (true) {
+        try {
+            System.out.println("\n|Admin Menu|");
+            System.out.println("1. Add Patient");
+            System.out.println("2. Add Doctor");
+            System.out.println("3. View Logs");
+            System.out.println("0. Exit");
+
+            int ch = sc.nextInt(); sc.nextLine(); //menu choice
+
+            switch (ch) {
+                case 1:
+                    System.out.print("Enter User ID: ");
+                    int uid = sc.nextInt();
+                    System.out.print("Enter Username: ");
+                    String uname = sc.nextLine();
+                    System.out.print("Enter First name: ");
+                    String uf = sc.nextLine();
+                    System.out.print("Enter Last name: ");
+                    String ul = sc.nextLine();
+                    System.out.print("Enter User Email: ");
+                    String uemail = sc.nextLine();
+                    System.out.print("Enter Gender(char): ");
+                    char ugen = sc.nextLine().charAt(0);
+                    System.out.print("Enter Patient ID: ");
+                    int pid = sc.nextInt();
+                    System.out.print("Enter Blood Type: ");
+                    String pbt = sc.nextLine();
+                    System.out.print("Enter Primary Doctor: ");
+                    String ppd = sc.nextLine();
+                    System.out.print("Has insurance?: ");
+                    boolean pi = sc.nextBoolean();
+                    
+                    addPatient(uid, uname, uf, ul, uemail, ugen, 
+                            pid, pbt, ppd, pi); //add new patient
+                    break;
+
+                case 2:
+                    System.out.print("Enter User ID: ");
+                    int Duid = sc.nextInt();
+                    System.out.print("Enter Username: ");
+                    String Duname = sc.nextLine();
+                    System.out.print("Enter First name: ");
+                    String Duf = sc.nextLine();
+                    System.out.print("Enter Last name: ");
+                    String Dul = sc.nextLine();
+                    System.out.print("Enter User Email: ");
+                    String Duemail = sc.nextLine();
+                    System.out.print("Enter Gender(char): ");
+                    char Dugen = sc.nextLine().charAt(0);
+                    System.out.print("Enter Doctor ID: ");
+                    int did = sc.nextInt();
+    
+                    System.out.print("Enter Department: ");
+                    String dd = sc.nextLine();
+                    
+                    System.out.print("Is currently training?: ");
+                    boolean dt = sc.nextBoolean();
+                    System.out.print("Enter Total Years of Experience: ");
+                    int de = sc.nextInt();
+                    System.out.print("Is on call duty?: ");
+                    boolean dc = sc.nextBoolean();
+                    System.out.print("Enter Password: ");
+                    String dp = sc.nextLine();
+                    
+                    
+                    addDoctor(Duid, Duname, Duf, Dul, Duemail, Dugen, did, 
+                            dd, dt, de, dc, dp); //add new doctor
+                    break;
+
+                case 3:
+                    viewLogs(); // View the logs
+                    break;
+
+                case 0:
+                    return; // Exit the Admin Menu
+
+                default:
+                    System.out.println("[Invalid Choice]");
+            }
+        } catch (InputMismatchException e) {
+            System.out.println("[Error] Invalid input. Please enter a valid number.");
+            sc.nextLine(); // Clear the input buffer to avoid infinite loop
+        } catch (Exception e) {
+            System.out.println("[Unexpected Error] " + e.getMessage());
+        }
+    }
+        
+       
+    
+    
+}
+}
+
+//class for vitals
+class VitalSign{
+    
+    //instance variables
+    private Patient patient;
+    private int heartRate; //beats per min
+    private float oxygenLevel; //in percent
+    private String bloodPressure; //e.g., 120/80 mmHg
+    private double temperature; //in centigrade
+    
+    //parameterized constructor
+    VitalSign(Patient p, int heartRate, float oxygenLevel, String bloodPressure,
+           double temperature){
+        
+        this.patient = p;
+        this.heartRate = heartRate;
+        this.oxygenLevel = oxygenLevel;
+        this.bloodPressure = bloodPressure;
+        this.temperature = temperature;
+}
+    //accessor methods
+    public int getHeartRate(){
+        return heartRate;
+    }
+    
+    public float getOxygenLevel(){
+        return oxygenLevel;
+    }
+    
+    public String getBloodPressure(){
+        return bloodPressure;
+    }
+    
+    public double getTemperature(){
+        return temperature;
+    }
+    
+    //the toString method has been overriden to show
+    //vital signs of the patients
+    @Override
+    public String toString(){
+        return "Class VitalSign\nThe patient " + patient.getPatientID() + 
+                "\t" + "has following vital signs\n" + 
+                "Heart Rate: " + heartRate + 
+                "\nOxygen Level: " + oxygenLevel +
+                "\nBlood Pressure: " + bloodPressure + 
+                "\nTemperature: " + temperature + "\n\n";
+    }
+}
+    
+//needed to manage all the vital
+//signs found within the system
+class VitalsDatabase {
+    
+    //instance variable is a list
+    //for storied different records
+    //of vital signs
+    private ArrayList<VitalSign> vitalSignList;
+    
+    //default constructor
+    VitalsDatabase(){
+        this.vitalSignList = new ArrayList<>();
+}
+    //getter
+    public ArrayList<VitalSign> getDB(){
+        return vitalSignList;
+    }
+    //methods to manage
+    //the vital sign list
+    public void addVitalSign(VitalSign vs){
+        vitalSignList.add(vs);
+    }
+    
+    
+    //displays all recorded vitals
+    public void displayVitals() {
+        for (VitalSign v : vitalSignList) 
+            System.out.println(v);
+    }
+}
+
+//template for all
+//appointments between patient and doctor
+class Appointment {
+    
+    //instance variables
+    private String date;
+    private Doctor doctor;
+    private Patient patient;
+    private String status; //e.g., completed, pending...
+    
+    //parameterized constructor
+    Appointment(String date, Doctor doctor, Patient patient, String status){
+        this.date = date;
+        this.doctor = doctor;
+        this.patient = patient;
+        this.status = "Pending.";
+    }
+    
+    //relevant getter/accessor methods
+    public String getDate(){
+        return date;
+    }
+    
+    public Doctor getDoctor(){
+        return doctor;
+}
+    
+    public String getDName(){
+        return doctor.getName();
+    }
+    
+    public Patient getPatient(){
+        return patient;
+    }
+    
+    public String getPName(){
+        return patient.getName();
+    }    
+    public String getStatus(){
+        return status;
+    }
+    
+    //setter method for updating status of appointment
+    public void setStatus(String status){
+        this.status = status;
+    }
+    
+    //toString overriden to show appointment details
+    @Override
+    public String toString(){
+        return "Class Appointment\nThe patient " + patient.getName()+ 
+                " has an appointment with doctor " + doctor.getName() +
+                " on " + date + ".\n\n";
+    }
+}
+
+//responsible for handling all 
+//appointments withis hospital
+class AppointmentManager{
+    
+    //instance variable for list of appointments
+    private ArrayList<Appointment> appointmentList = new ArrayList<>();
+    
+    //parameterized constructor
+    AppointmentManager(ArrayList<Appointment> appointment){
+        this.appointmentList  = appointment;
+    }
+    
+    
+    
+        //requests an appointment by adding it to the list
+    public void requestAppointment(Appointment appointment) {
+        appointmentList.add(appointment);
+        System.out.println("Appointment requested successfully.");
+    }
+
+    //accepts an appointment by updating its status
+    public void acceptAppointment(Appointment appointment) {
+        appointment.setStatus("Accepted");
+        System.out.println("Appointment accepted for " + appointment.getPatient().getName());
+    }
+
+    //rejects an appointment by updating its status
+    public void rejectAppointment(Appointment appointment) {
+        appointment.setStatus("Rejected.");
+        System.out.println("Appointment rejected for " + appointment.getPatient().getName());
+    }
+
+    //cancels an appointment by removing it from the list
+    public void cancelAppointment(Appointment appointment) {
+        appointmentList.remove(appointment);
+        System.out.println("[INFO] Appointment canceled for " + appointment.getPatient().getName());
+    }
+
+    //displays all scheduled appointments
+    public void viewAppointments() {
+        System.out.println("\n=== All Appointments ===");
+        if (appointmentList.isEmpty()) {
+            System.out.println("No scheduled appointments.");
+        } else {
+            for (Appointment appt : appointmentList) {
+                System.out.println("- " + appt);
+            }
+        }
+    }
+
+    //finding appointments by the patient id
+    public ArrayList<Appointment> findAppointmentsByPatientID(int patientID) {
+        ArrayList<Appointment> foundAppointments = new ArrayList<>();
+        for (Appointment a : appointmentList) {
+            if (a.getPatient().getUserID() == (patientID)) {
+                foundAppointments.add(a);
+            }
+        }
+        return foundAppointments;
+    }
+    
+    public void handle(Scanner sc) {
+    while (true) {
+        try {
+            System.out.println("\n[Appointment Manager]");
+            System.out.println("[1] View Appointments");
+            System.out.println("[2] Approve/Reject");
+            System.out.println("[0] Exit");
+
+            int ch = sc.nextInt(); sc.nextLine(); //read menu choice
+            switch (ch) {
+                case 1:
+                    viewAppointments(); //display all appointments
+                    break;
+
+                case 2:
+                    System.out.print("Enter Patient ID: ");
+                    int id = sc.nextInt();
+                    ArrayList<Appointment> appts = findAppointmentsByPatientID(id); //find appointments by patient ID
+                    if (appts.isEmpty()) {
+                        System.out.println("[No Appointments]");
+                    } else {
+                        for (int i = 0; i < appts.size(); i++) {
+                            System.out.println("[" + (i + 1) + "] " + appts.get(i));
+                        }
+                        System.out.print("Select Index: ");
+                        int i = sc.nextInt() - 1; sc.nextLine(); //read selected index
+                        if (i >= 0 && i < appts.size()) {
+                            System.out.print("[1] Approve [2] Reject: ");
+                            int d = sc.nextInt(); sc.nextLine(); //read approve or reject choice
+                            if (d == 1) {
+                                acceptAppointment(appts.get(i)); //approve the appointment
+                            } else if (d == 2) {
+                                rejectAppointment(appts.get(i)); //reject the appointment
+                            } else {
+                                System.out.println("[Invalid choice]");
+                            }
+                        } else {
+                            System.out.println("[Invalid Index]");
+                        }
+                    }
+                    break;
+
+                case 0:
+                    return; //exit the Appointment Manager
+
+                default:
+                    System.out.println("[Invalid Choice]");
+            }
+
+        } catch (InputMismatchException e) {
+            System.out.println("[Error] Invalid input. Please enter a valid number.");
+            sc.nextLine(); //clear the input buffer to avoid infinite loop
+        } catch (Exception e) {
+            System.out.println("[Unexpected Error] " + e.getMessage());
+        }
+    }
+}
+}
+
+//medicine prescribed and details for taking it
+class Prescription {
+    
+    //instance variables
+    private String medication;
+    private float dosage; //e.g., 1.5 mg
+    private String schedule; //every morning for example
+    private String prescribingDoc;
+    
+    //parameterized constructor
+    Prescription(String med, float dos, String sched, String pD){
+        medication = med;
+        dosage = dos;
+        schedule = sched;
+        prescribingDoc = pD;
+    }
+    
+    //overriden toString methods showing
+    //details of prescribed meds
+    @Override
+    public String toString(){
+        return "Class Precription\nMedication " + medication + 
+                " needs to be taken " + schedule +
+                " and its amount should be " + dosage + "mg.\n\n";
+    }
+}
+
+//manages feedback of doctors for their many
+//patients
+class Feedback{
+    
+    //instance variables
+    private String doctorName;
+    private String feedback;
+ 
+    
+    //parameterized constructor
+    Feedback(String dN, String feedback){
+        this.doctorName = dN;
+        this.feedback = feedback;
+       
+        
+    }
+    
+    //getter methods and also adding and removing feedbacks
+    
+    public String getDoctorName(){
+        return doctorName;
+    }
+    
+
+    public String getFeedback(){
+        return feedback;
+    }
+
+    
+    
+   
+    //overriden toString methods showing
+    //details of doctor's feedback
+    @Override
+    public String toString(){
+        return "Class Feedback\nDoctor " + doctorName + 
+                " made following comments: " +
+                "\n" + feedback + "\n\n";
+    }
+}
+
+//class for consulations
+
+class Consultation{
+    //instance variables
+    private Doctor doctor;
+    private Patient patient;
+    private String diagnosis;
+    private String treatment;
+    
+    //parameterized constructor
+    Consultation(Doctor doctor, Patient patient, String diagnosis){
+        this.doctor = doctor;
+        this.patient = patient;
+        this.diagnosis = diagnosis;
+    }
+    
+    //getter method
+    public String getDiagnosis(){
+        return diagnosis;
+    }
+    
+    //overriden toString methods showing
+    //diagnosis given by doctor
+    @Override
+    public String toString(){
+        return "Class Consultation\nDoctor " + doctor.getName() + 
+                " made following diagnosis for the patient " + patient.getName() +
+                "\n" + diagnosis + "\n\n";
+    }
+}
+
+//manages past consulatations and prescrptions
+class MedicalHistory{
+    
+    //instance variables
+    private ArrayList<Consultation> consultationList;
+    private ArrayList<Prescription> prescriptionList;
+    
+    //default constructor
+    MedicalHistory(){
+        this.consultationList = new ArrayList<>();
+        this.prescriptionList = new ArrayList<>();
+    }
+    
+    //adding and displaying methods for 
+    //prescriptions and consulations
+    
+    public void addConsultation(Consultation c){
+        consultationList.add(c);
+        
+    }
+    
+    public void displayConsultations(){
+        System.out.println("Past Consulations: ");
+        for (Consultation con : consultationList){
+            System.out.println(con);
+        }
+    }
+    
+    public void addPrescription(Prescription p){
+        prescriptionList.add(p);
+    }
+    
+    public void displayPrescriptions(){
+        System.out.println("Past Prescriptions: ");
+        for (Prescription pres : prescriptionList){
+            System.out.println(pres);
+        }
+    }
+    
+}
+
+//testing application(main)
+
+public class Assignment3 {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        ArrayList<Patient> patients = new ArrayList<>();
+        ArrayList<Doctor> doctors = new ArrayList<>();
+        ArrayList<Appointment> appointments = new ArrayList<>();
+        AppointmentManager appointmentManager = new AppointmentManager(appointments);
+        Administrator admin = new Administrator(doctors, patients);
+
+        doctors.add(new Doctor(111, "drali", "Ali", "Wazeer", 
+                "ali1@gmail.com",'M', 567, "Cardiology", true, 10, true, "atrue1"));
+        doctors.add(new Doctor(222, "proftasleem", "Tasleem", "Amir", 
+        "tasleem@gmail.com", 'F', 589, "Cardiology", true, 8, true, "ttrue2"));
+
+        
+        EmergencyAlert emergencyAlert = new EmergencyAlert();
+        PanicButton panicButton = new PanicButton();
+        ChatServer chatServer = new ChatServer();
+        ChatClient chatClient = new ChatClient();
+        VideoCall videoCall = new VideoCall();
+
+        while (true) {
+            try {
+                System.out.println("\nRemote Health Monitoring System");
+                System.out.println("1. Patient");
+                System.out.println("2. Doctor");
+                System.out.println("3. Admin");
+                System.out.println("4. Appointment Manager");
+                System.out.println("0. Exit");
+                System.out.print("Select an option based on your role: ");
+
+                int ch = scanner.nextInt();
+                scanner.nextLine(); //consume newline
+
+                switch (ch) {
+                    case 1:
+                        System.out.print("Patient ID: ");
+                        int pid = scanner.nextInt();
+                        Patient p = findPatientById(patients, pid);
+                        if (p != null) {
+                            try {
+                                p.handle(scanner, doctors, appointmentManager,
+                                        emergencyAlert, panicButton, chatClient, videoCall);
+                            } catch (Exception e) {
+                                System.out.println("Error while handling patient: " + e.getMessage());
+                            }
+                        } else {
+                            System.out.println("Patient Not Found");
+                        }
+                        break;
+
+                    case 2:
+                        System.out.print("Doctor Name: ");
+                        String dname = scanner.nextLine();
+                        Doctor d = findDoctorByName(doctors, dname);
+                        if (d != null) {
+                            System.out.print("Password: ");
+                            String password = scanner.nextLine();
+                            if (d.authenticate(password)) {
+                                try {
+                                    d.handle(scanner, patients);
+                                } catch (Exception e) {
+                                    System.out.println("Error while handling doctor: " + e.getMessage());
+                                }
+                            } else {
+                                System.out.println("Wrong Password");
+                            }
+                        } else {
+                            System.out.println("Doctor Not Found");
+                        }
+                        break;
+
+                    case 3:
+                        System.out.print("Username: ");
+                        String username = scanner.nextLine();
+                        System.out.print("Password: ");
+                        String pw = scanner.nextLine();
+                        try{
+                                admin.handle(scanner);
+                            } catch (Exception e) {
+                                System.out.println("Admin Error: " + e.getMessage());
+                            }
+                         
+                        break;
+
+                    case 4:
+                        try {
+                            appointmentManager.handle(scanner);
+                        } catch (Exception e) {
+                            System.out.println("Appointment Handling Error: " + e.getMessage());
+                        }
+                        break;
+
+                    case 0:
+                        System.out.println("You have exited the program.");
+                        return;
+
+                    default:
+                        System.out.println("Invalid choice.");
+                }
+
+            } catch (InputMismatchException ime) {
+                System.out.println("[Invalid input: Enter a number]");
+                scanner.nextLine(); //clear the wrong input
+            } catch (Exception e) {
+                System.out.println("[Unexpected error]: " + e.getMessage());
+            }
+        }
+    }
+    public static Patient findPatientById(ArrayList<Patient> patients, int id) {
+        for (Patient p : patients){ 
+            if (p.getUserID() == id) {
+            return p;
+        }
+        }
+        return null;
+    }
+
+    public static Doctor findDoctorByName(ArrayList<Doctor> doctors, String name) {
+        for (Doctor d : doctors)
+        { if (d.getName().equalsIgnoreCase(name)) 
+            
+            {
+            return d;
+        }
+        }
+        return null;
+    }
+}
