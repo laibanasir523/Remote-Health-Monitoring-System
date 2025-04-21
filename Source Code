@@ -1,3 +1,4 @@
+
 package assignment3;
 
 import java.util.ArrayList; //needed for lists used 
@@ -405,7 +406,7 @@ class Doctor extends User{
     
     //displays the doctor's scheduled appointments
     public void viewAppointments() {
-        System.out.println("\n[Doctor's Appointments]");
+        System.out.println("\n|Doctor's Appointments|");
         if (doctorAppointments.isEmpty()) {
             System.out.println("No scheduled appointments.");
         } else {
@@ -418,8 +419,8 @@ class Doctor extends User{
     //adds feedback for a patient
     public void addFeedback(Patient patient, String feed) {
         Feedback feedback = new Feedback(this.getName(), feed);
-        patient.getFeedbacks().add(feedback); // Adds feedback to patient's feedback list
-        System.out.println("[INFO] Feedback added for " + patient.getName());
+        patient.getFeedbacks().add(feedback); //adds feedback to patient's feedback list
+        System.out.println("Feedback added for " + patient.getName());
     }
     
     public void handle(Scanner sc, ArrayList<Patient> patients) {
@@ -438,7 +439,7 @@ class Doctor extends User{
                 case 1:
                     //displaying patient list
                     if (patients.isEmpty()) {
-                        System.out.println("[No Patients Available]");
+                        System.out.println("No Patients Available");
                     } else {
                         for (Patient p : patients) {
                             System.out.println(p.getUserID() + ": " + p.getName());
@@ -453,10 +454,11 @@ class Doctor extends User{
                     Patient p = Assignment3.findPatientById(patients, pid);
                     if (p != null) {
                         System.out.print("Enter Feedback for your patient: ");
+                        sc.nextLine();
                         String fb = sc.nextLine();
                         addFeedback(p, fb); 
                     } else {
-                        System.out.println("Patient  ot found.");
+                        System.out.println("Patient  not found.");
                     }
                     break;
 
@@ -517,7 +519,7 @@ class Administrator{
            String primaryDoctor, boolean hasInsurance) {
         patients.add(new Patient(uID, uname, uf, ul, uemail, ugen, patientID,
         bloodType, primaryDoctor, hasInsurance));
-        System.out.println("[INFO] Patient added successfully.");
+        System.out.println("|Info| Patient added successfully.");
         logAction("Patient " + uname + " added.");
     }
 
@@ -525,7 +527,7 @@ class Administrator{
     public boolean authenticate(String ausername, String apassword) {
         return username.equals(ausername) && password.equals(apassword);
     }
-    private ArrayList<String> systemLogList = new ArrayList<>(); // Stores system logs
+    private ArrayList<String> systemLogList = new ArrayList<>(); //stores system logs
 
     //logs admin actions
     public void logAction(String message) {
@@ -559,18 +561,24 @@ class Administrator{
                     int uid = sc.nextInt();
                     System.out.print("Enter Username: ");
                     String uname = sc.nextLine();
+                    sc.nextLine();
                     System.out.print("Enter First name: ");
                     String uf = sc.nextLine();
+                    
                     System.out.print("Enter Last name: ");
                     String ul = sc.nextLine();
+                    
                     System.out.print("Enter User Email: ");
                     String uemail = sc.nextLine();
+                    
                     System.out.print("Enter Gender(char): ");
                     char ugen = sc.nextLine().charAt(0);
+                    
                     System.out.print("Enter Patient ID: ");
                     int pid = sc.nextInt();
                     System.out.print("Enter Blood Type: ");
                     String pbt = sc.nextLine();
+                    sc.nextLine();
                     System.out.print("Enter Primary Doctor: ");
                     String ppd = sc.nextLine();
                     System.out.print("Has insurance?: ");
@@ -585,6 +593,7 @@ class Administrator{
                     int Duid = sc.nextInt();
                     System.out.print("Enter Username: ");
                     String Duname = sc.nextLine();
+                    sc.nextLine();
                     System.out.print("Enter First name: ");
                     String Duf = sc.nextLine();
                     System.out.print("Enter Last name: ");
@@ -1147,7 +1156,7 @@ public class Assignment3 {
     }
     public static Patient findPatientById(ArrayList<Patient> patients, int id) {
         for (Patient p : patients){ 
-            if (p.getUserID() == id) {
+            if (p.getPatientID() == id) {
             return p;
         }
         }
@@ -1165,3 +1174,4 @@ public class Assignment3 {
         return null;
     }
 }
+
