@@ -11,5 +11,13 @@ The RHMS allows for the following functions for its users wherever they may be t
 -	Emergency alerts or the panic button can be modified by the patient.
 - Notification services in the mode of chat and video calls are also available.
 
-# Requirements
-Java 11 or higher 
+# How to Run the Project
+1. Install JDK 8 or later.
+2. Save the file Assignment3.java.
+3. Compile and run through command prompt using
+   'javac Assignment3.java
+   'java Assignment3
+
+# Login Details
+  Admin Username: Admin1
+  Admin Password: A4321
