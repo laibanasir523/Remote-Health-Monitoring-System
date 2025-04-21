@@ -19,5 +19,6 @@ The RHMS allows for the following functions for its users wherever they may be t
    'java Assignment3
 
 # Login Details
-  Admin Username: Admin1
-  Admin Password: A4321
+- Admin Username: Admin1, Admin Password: A4321
+- Doctor 1 Name: Ali Wazeer, Doctor 1 Password: atrue1
+- Doctor 2 Name: Tasleem Amir, Doctor 2 Password: ttrue2
