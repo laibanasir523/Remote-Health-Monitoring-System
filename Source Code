@@ -1118,15 +1118,20 @@ public class Assignment3 {
                         break;
 
                     case 3:
+                        
                         System.out.print("Username: ");
                         String username = scanner.nextLine();
                         System.out.print("Password: ");
                         String pw = scanner.nextLine();
+                        if (admin.authenticate(username, pw))
                         try{
                                 admin.handle(scanner);
                             } catch (Exception e) {
                                 System.out.println("Admin Error: " + e.getMessage());
                             }
+                        else{
+                            System.out.println("Invalid admin login credentials");
+                        }
                          
                         break;
 
@@ -1173,5 +1178,7 @@ public class Assignment3 {
         }
         return null;
     }
-}
+    
+    
 
+}
